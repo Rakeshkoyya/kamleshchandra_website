@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# kamleshchandra.com — website (UI demo)
 
-## Getting Started
+The website for **Kamlesh Chandra**: memory and learning educator, creator of *Scientific Retention Management*,
+and Director – Academics at SHANA International School, Bikaner.
 
-First, run the development server:
+This is a **front-end demo**. Every workflow (buying books and programs, checkout, registering for events,
+learner dashboard, course player, admin studio) has working UI on top of **mock data**, so the backend can be
+wired in later without redesigning anything.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build && npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Stack: Next.js 16 (App Router, Cache Components), React 19, TypeScript, Tailwind CSS v4, GSAP (scroll scenes).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Sitemap
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Area | Routes |
+|---|---|
+| Story | `/` (home), `/about`, `/contact` (invite KC to your school) |
+| Shop | `/programs`, `/programs/[slug]`, `/books`, `/books/[slug]`, `/cart`, `/checkout`, `/checkout/success` |
+| Content | `/journal`, `/journal/[slug]`, `/events`, `/events/[slug]` |
+| Learners | `/signin` (phone OTP, demo code `123456`), `/account`, `/learn/[slug]` |
+| Admin | `/studio` dashboard, `/studio/programs(/new)`, `/studio/books(/new)`, `/studio/journal(/new)`, `/studio/events`, `/studio/orders`, `/studio/learners`, `/studio/settings` |
 
-## Learn More
+Demo shortcuts: coupon `RHYTHM10` (10% off), UPI ID `fail@upi` shows the payment-failed path.
 
-To learn more about Next.js, take a look at the following resources:
+## Where the backend plugs in
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Search the code for `BACKEND:` — every place that would call an API is marked.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Concern | Today (demo) | Replace with |
+|---|---|---|
+| Catalogue, posts, events | `src/lib/data/*.ts` async getters returning arrays | DB/CMS queries with the same return types (`src/lib/types.ts`) |
+| Cart | `src/lib/cart/store.ts` (localStorage) | server cart keyed by session cookie; keep the `useCart()` API |
+| Checkout & payments | simulated in the checkout flow | create order on the server → payment gateway (e.g. Razorpay) → verify signature server-side → webhook marks order paid |
+| Auth | demo OTP | SMS OTP provider + httpOnly session cookie |
+| Studio CRUD | local React state | server actions / API routes with admin authorization |
+| Forms (contact, RSVP, newsletter) | client-side success state | server action + email/WhatsApp notification, rate limiting |
 
-## Deploy on Vercel
+## Design system
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Recorded in [`.ui-craft/design.md`](.ui-craft/design.md): story brief, structure, tokens and rules.
+Tokens live in `src/app/globals.css`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The central idea is **"the rhythm of remembering"**: a forgetting curve that rises with every revisit. It shows up
+as the logo mark, the section dividers, the home page's scroll scene, and the learner dashboard's "Today's revisit".
+
+## Content status
+
+- Real facts (roles, numbers, frameworks, press, contacts, mantra) come from the client's profile sheets in
+  `docs/` and live in `src/lib/data/site.ts`.
+- Programs, books, prices, events, posts and orders are **sample data**, marked in the UI.
+- Photos other than the portrait are Creative Commons stand-ins. Credits are in `public/images/CREDITS.md`.
+  Replace them with Kamlesh Chandra's own photos before launch.
